@@ -17,8 +17,8 @@
 ### 1. Clona il repository
 
 ```bash
-git clone https://github.com/tuo-utente/nome-repo.git
-cd nome-repo
+git clone https://github.com/alencrystal/es_final_libri.git
+cd es_final_libri
 ```
 
 ### 2. Installa le dipendenze
