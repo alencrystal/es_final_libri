@@ -102,7 +102,31 @@ async function routes(fastify, options) {
         return reply.code(500).send({ error: 'Errore durante l\'eliminazione del libro' });
       }
     });
+
+//per cercare libri per titolo o autore anche in modo parziale
+
+    // GET /books/search/:query 
+    fastify.get('/search/:query', async (request, reply) => {
+      const { query } = request.params;
+
+      try {
+        const [rows] = await fastify.mysql.query(
+          `SELECT * FROM books WHERE titolo LIKE ? OR autore LIKE ?`,
+          [`%${query}%`, `%${query}%`]
+        );
+        reply.send(rows);
+      } catch (err) {
+        fastify.log.error(err); // usa fastify.log
+        reply.status(500).send({ error: 'Errore durante la ricerca' });
+      }
+    });
+
   }
   
   module.exports = routes;
   
+
+  // 200 è andato a buon fine
+  // 201 è stato creato
+  // 404 non trovato
+  // 500 errore del server

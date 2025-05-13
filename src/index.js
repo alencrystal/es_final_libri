@@ -1,7 +1,7 @@
 const fastify = require('fastify')({ logger: true }); //avvio server fastify
 require('dotenv').config(); //carica variabili d'ambiente
 
-// TODO: Registrazione DB 
+// DB 
 fastify.register(require('./plugins/db'));
 
 // Rotte

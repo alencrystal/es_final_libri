@@ -1,12 +1,22 @@
-## 📖 Struttura di un libro
+## 📖 Struttura di un libro, di un autore e del genere
 
 ```json
 {
   "id": 1,
-  "titolo": "Come invadere la Polonia in 3 passaggi",
-  "autore": "Larry the Cat",
-  "anno": 1939,
-  "genere": "Documentario storico"
+  "titolo": "Come aprire una porta i 3 passaggi",
+  "autore": 1,
+  "anno": 1969,
+  "genere": 1
+}
+
+{
+  "id": 1,
+  "nome": "Larry the Cat"
+}
+
+{
+  "id": 1,
+  "nome": "Fantasy"
 }
 ````
 

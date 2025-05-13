@@ -1,5 +1,7 @@
 const axios = require('axios');
 
+//axios serve per fare richieste http (tipo post, get, etc)
+
 const books = [
   {
     titolo: "1984",
