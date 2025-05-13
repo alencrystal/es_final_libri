@@ -62,6 +62,12 @@ Assicurati che MySQL sia in esecuzione.
 npm run dev
 ```
 
+### 6. (Opzionale) Popola il database con il seeder
+
+```bash
+npm run seed
+```
+
 L'app sarà disponibile all'indirizzo:
 [http://localhost:3000](http://localhost:3000)
 
