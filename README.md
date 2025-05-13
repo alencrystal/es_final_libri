@@ -1,6 +1,4 @@
-# es_final_libri
-
-Ogni libro ha la seguente struttura:
+## 📖 Struttura di un libro
 
 ```json
 {
@@ -10,41 +8,63 @@ Ogni libro ha la seguente struttura:
   "anno": 1939,
   "genere": "Documentario storico"
 }
+````
 
-Setup locale
+---
 
-##  1. Clona il repository
+## Setup locale
+
+### 1. Clona il repository
 
 ```bash
 git clone https://github.com/tuo-utente/nome-repo.git
 cd nome-repo
+```
 
-##  2. Installa le dipendenze
+### 2. Installa le dipendenze
 
+```bash
 npm install
+```
 
+### 3. Crea il file `.env` per la configurazione
 
-##  3. crea un file .env copiando e compilando l'example
+Copia il file `.env.example` e rinominalo in `.env`:
 
+```bash
 cp .env.example .env
+```
 
-*Apri .env e inserisci le tue credenziali MySQL*
+Modifica i valori al suo interno con le tue credenziali MySQL:
 
+```
 DB_HOST=localhost
 DB_USER=your_user
 DB_PASSWORD=your_password
 DB_NAME=books_db
-PORT=3000
 DB_PORT=3306
+PORT=3000
+```
 
-##  4. lancia questo comando per creare la tabella dei libri secondo lo script init.sql
+### 4. Crea il database e la tabella
 
+Esegui il file `init.sql` per creare il database `books_db` e la tabella `books`:
+
+```bash
 mysql -u tuo_utente -p < init.sql
+```
 
+Assicurati che MySQL sia in esecuzione.
 
+### 5. Avvia il server
 
-##  5. Avvia l'app
-
+```bash
 npm run dev
+```
 
-//a quel punto sarà disponibile su http://localhost:3000
+L'app sarà disponibile all'indirizzo:
+[http://localhost:3000](http://localhost:3000)
+
+---
+
+
