@@ -1,12 +1,12 @@
-## 📖 Struttura di un libro, di un autore e del genere
+## Struttura di un libro, di un autore e del genere
 
 ```json
 {
   "id": 1,
-  "titolo": "Come aprire una porta i 3 passaggi",
-  "autore": 1,
+  "titolo": "Come aprire una porta in 3 passaggi",
+  "autore_id": 1,
   "anno": 1969,
-  "genere": 1
+  "genere_id": 1
 }
 
 {
@@ -58,10 +58,10 @@ PORT=3000
 
 ### 4. Crea il database e la tabella
 
-Esegui il file `init.sql` per creare il database `books_db` e la tabella `books`:
+Esegui il file `init.sql` per creare il database `books_db` e le tabelle `books` `authors` `genres`:
 
 ```bash
-mysql -u tuo_utente -p < init.sql
+npm run init-db
 ```
 
 Assicurati che MySQL sia in esecuzione.
@@ -72,7 +72,7 @@ Assicurati che MySQL sia in esecuzione.
 npm run dev
 ```
 
-### 6. (Opzionale) Popola il database con il seeder
+### 6. (non funzionante in questo momento) Popola il database con il seeder 
 
 ```bash
 npm run seed
