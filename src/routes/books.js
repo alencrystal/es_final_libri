@@ -23,30 +23,30 @@ async function routes(fastify, options) {
 
   
     // GET /books/:id
-    fastify.get('/:id', async (request, reply) => {
-      const { id } = request.params;
+    // fastify.get('/:id', async (request, reply) => {
+    //   const { id } = request.params;
   
-      try {
-        const [rows] = await fastify.mysql.query(`SELECT 
-            books.id,
-            books.titolo,
-            books.anno,
-            authors.nome AS autore,
-            genres.nome AS genere
-          FROM books
-          JOIN authors ON books.autore_id = authors.id
-          JOIN genres ON books.genere_id = genres.id WHERE id = ?`, [id]);
+    //   try {
+    //     const [rows] = await fastify.mysql.query(`SELECT 
+    //         books.id,
+    //         books.titolo,
+    //         books.anno,
+    //         authors.nome AS autore,
+    //         genres.nome AS genere
+    //       FROM books
+    //       JOIN authors ON books.autore_id = authors.id
+    //       JOIN genres ON books.genere_id = genres.id WHERE id = ?`, [id]);
   
-        if (rows.length === 0) {
-          return reply.code(404).send({ error: 'Libro non trovato' });
-        }
+    //     if (rows.length === 0) {
+    //       return reply.code(404).send({ error: 'Libro non trovato' });
+    //     }
   
-        return rows[0];
-      } catch (err) {
-        fastify.log.error(err);
-        return reply.code(500).send({ error: 'Errore durante la ricerca del libro' });
-      }
-    });
+    //     return rows[0];
+    //   } catch (err) {
+    //     fastify.log.error(err);
+    //     return reply.code(500).send({ error: 'Errore durante la ricerca del libro' });
+    //   }
+    // });
   
     // POST /books
     fastify.post('/', async (request, reply) => {
@@ -124,25 +124,47 @@ async function routes(fastify, options) {
     });
 
     
-//per cercare libri per titolo o autore anche in modo parziale (spoiler non funziona)
+//
 
-    // GET /books/search/:query 
-    // fastify.get('/search/:query', async (request, reply) => {
-    //   const { query } = request.params;
 
-    //   try {
-    //     const [rows] = await fastify.mysql.query(
-    //       `SELECT * FROM books WHERE titolo LIKE ? OR autore LIKE ?`,
-    //       [`%${query}%`, `%${query}%`]
-    //     );
-    //     reply.send(rows);
-    //   } catch (err) {
-    //     fastify.log.error(err); // usa fastify.log
-    //     reply.status(500).send({ error: 'Errore durante la ricerca' });
-    //   }
-    // });
+// GET /books/:query --search tramite ID o parola contenuta nel libro
+fastify.get('/:query', async (request, reply) => {
+  const { query } = request.params;
+  const isNumeric = /^\d+$/.test(query); // Verifica se è un intero con un controllo regex (.test restituisce un bool)
 
+  try {
+    let sql = `
+      SELECT
+        books.id, 
+        books.titolo, 
+        books.anno, 
+        authors.nome AS autore,
+        genres.nome AS genere
+      FROM books
+      JOIN authors ON books.autore_id = authors.id
+      JOIN genres ON books.genere_id = genres.id
+      WHERE books.titolo LIKE ?
+    `;
+
+    const values = [`%${query}%`];
+
+    if (isNumeric) {
+      sql += ` OR books.id = ?`;
+      values.push(parseInt(query));
+    }
+
+    const [rows] = await fastify.mysql.query(sql, values);
+    reply.send(rows);
+
+  } catch (err) {
+    fastify.log.error(err);
+    reply.status(500).send({ error: 'Errore durante la ricerca' });
   }
+});
+
+
+}
+
   
   module.exports = routes;
   

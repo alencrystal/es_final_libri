@@ -95,7 +95,7 @@ async function genreRoutes(fastify, options) {
     }
   });
 
-// GET /genres/books/:id - Recupera i libri di un genere specifico
+// GET /genres/books/:id - Recupera i libri di un genere specifico in base all'ID
   fastify.get('/books/:id', async (request, reply) => {
     const { id } = request.params;
 
@@ -126,6 +126,22 @@ async function genreRoutes(fastify, options) {
         return reply.code(500).send({ error: 'Errore durante il recupero dei libri del genere' });
     }
     });
+
+
+// GET /genres/search/:query - Cerca per nome anche in modo parziale nei generi
+  fastify.get('/search/:query', async (request, reply) => {
+    const { query } = request.params;
+
+    try {
+      const [rows] = await fastify.mysql.query(
+        `SELECT * FROM genres WHERE nome LIKE ?`, [`%${query}%`]
+      );
+      reply.send(rows);
+    } catch (err) {
+      fastify.log.error(err); 
+      reply.status(500).send({ error: 'Errore durante la ricerca' });
+    }
+  });
 
 }
 

@@ -95,7 +95,7 @@ async function authorRoutes(fastify, options) {
     }
   });
 
-  // GET /authors/books/:id - Recupera i libri di un autore specifico
+  // GET /authors/books/:id - Recupera i libri di un autore specifico in base all'ID
   fastify.get('/books/:id', async (request, reply) => {
     const { id } = request.params;
 
@@ -126,6 +126,22 @@ async function authorRoutes(fastify, options) {
         return reply.code(500).send({ error: 'Errore durante il recupero dei libri dell\'autore' });
     }
     });
+
+// GET /authors/search/:query - Cerca autori per nome anche parziale
+  fastify.get('/search/:query', async (request, reply) => {
+    const { query } = request.params;
+
+      try {
+        const [rows] = await fastify.mysql.query(
+          `SELECT * FROM authors WHERE nome LIKE ?`, [`%${query}%`]
+        );
+        reply.send(rows);
+      } catch (err) {
+        fastify.log.error(err);
+        reply.status(500).send({ error: 'Errore durante la ricerca' });
+      }
+    });
+
 
 }
 
