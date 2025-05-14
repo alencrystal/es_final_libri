@@ -102,9 +102,15 @@ async function genreRoutes(fastify, options) {
     try {
         const [rows] = await fastify.mysql.query(
         `
-        SELECT books.id, books.titolo, books.anno, authors.nome AS autore
+        SELECT 
+          books.id, 
+          books.titolo, 
+          books.anno, 
+          authors.nome AS autore,
+          genres.nome AS genere
         FROM books
         JOIN authors ON books.autore_id = authors.id
+        JOIN genres ON books.genere_id = genres.id
         WHERE books.genere_id = ?
         `,
         [id]

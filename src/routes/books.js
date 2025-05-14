@@ -1,21 +1,41 @@
 async function routes(fastify, options) {
-    // GET /books
-    fastify.get('/', async (request, reply) => {
+    // GET /books 
+  fastify.get('/', async (request, reply) => {
       try {
-        const [rows] = await fastify.mysql.query('SELECT * FROM books');
+        const [rows] = await fastify.mysql.query(`
+          SELECT 
+            books.id,
+            books.titolo,
+            books.anno,
+            authors.nome AS autore,
+            genres.nome AS genere
+          FROM books
+          JOIN authors ON books.autore_id = authors.id
+          JOIN genres ON books.genere_id = genres.id
+        `);
+
         return rows;
       } catch (err) {
         fastify.log.error(err);
         return reply.code(500).send({ error: 'Errore durante il recupero dei libri' });
       }
     });
+
   
     // GET /books/:id
     fastify.get('/:id', async (request, reply) => {
       const { id } = request.params;
   
       try {
-        const [rows] = await fastify.mysql.query('SELECT * FROM books WHERE id = ?', [id]);
+        const [rows] = await fastify.mysql.query(`SELECT 
+            books.id,
+            books.titolo,
+            books.anno,
+            authors.nome AS autore,
+            genres.nome AS genere
+          FROM books
+          JOIN authors ON books.autore_id = authors.id
+          JOIN genres ON books.genere_id = genres.id WHERE id = ?`, [id]);
   
         if (rows.length === 0) {
           return reply.code(404).send({ error: 'Libro non trovato' });
