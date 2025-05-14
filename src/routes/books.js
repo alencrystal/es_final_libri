@@ -30,24 +30,24 @@ async function routes(fastify, options) {
   
     // POST /books
     fastify.post('/', async (request, reply) => {
-      const { titolo, autore, anno, genere } = request.body;
+      const { titolo, autore_id, anno, genere_id } = request.body;
   
-      if (!titolo || !autore || !anno || !genere) {
+      if (!titolo || !autore_id || !anno || !genere_id) {
         return reply.code(400).send({ error: 'Tutti i campi sono obbligatori' });
       }
   
       try {
         const [result] = await fastify.mysql.query(
-          'INSERT INTO books (titolo, autore, anno, genere) VALUES (?, ?, ?, ?)',
-          [titolo, autore, anno, genere]
+          'INSERT INTO books (titolo, autore_id, anno, genere_id) VALUES (?, ?, ?, ?)',
+          [titolo, autore_id, anno, genere_id]
         );
   
         const newBook = {
           id: result.insertId,
           titolo,
-          autore,
+          autore_id,
           anno,
-          genere
+          genere_id
         };
   
         return reply.code(201).send(newBook);
@@ -60,12 +60,12 @@ async function routes(fastify, options) {
     // PUT /books/:id
     fastify.put('/:id', async (request, reply) => {
       const { id } = request.params;
-      const { titolo, autore, anno, genere } = request.body;
+      const { titolo, autore_id, anno, genere_id } = request.body;
   
       try {
         const [result] = await fastify.mysql.query(
-          'UPDATE books SET titolo = ?, autore = ?, anno = ?, genere = ? WHERE id = ?',
-          [titolo, autore, anno, genere, id]
+          'UPDATE books SET titolo = ?, autore_id = ?, anno = ?, genere_id = ? WHERE id = ?',
+          [titolo, autore_id, anno, genere_id, id]
         );
   
         if (result.affectedRows === 0) {
@@ -75,9 +75,9 @@ async function routes(fastify, options) {
         return {
           id: parseInt(id),
           titolo,
-          autore,
+          autore_id,
           anno,
-          genere
+          genere_id
         };
       } catch (err) {
         fastify.log.error(err);
@@ -103,23 +103,24 @@ async function routes(fastify, options) {
       }
     });
 
-//per cercare libri per titolo o autore anche in modo parziale
+    
+//per cercare libri per titolo o autore anche in modo parziale (spoiler non funziona)
 
     // GET /books/search/:query 
-    fastify.get('/search/:query', async (request, reply) => {
-      const { query } = request.params;
+    // fastify.get('/search/:query', async (request, reply) => {
+    //   const { query } = request.params;
 
-      try {
-        const [rows] = await fastify.mysql.query(
-          `SELECT * FROM books WHERE titolo LIKE ? OR autore LIKE ?`,
-          [`%${query}%`, `%${query}%`]
-        );
-        reply.send(rows);
-      } catch (err) {
-        fastify.log.error(err); // usa fastify.log
-        reply.status(500).send({ error: 'Errore durante la ricerca' });
-      }
-    });
+    //   try {
+    //     const [rows] = await fastify.mysql.query(
+    //       `SELECT * FROM books WHERE titolo LIKE ? OR autore LIKE ?`,
+    //       [`%${query}%`, `%${query}%`]
+    //     );
+    //     reply.send(rows);
+    //   } catch (err) {
+    //     fastify.log.error(err); // usa fastify.log
+    //     reply.status(500).send({ error: 'Errore durante la ricerca' });
+    //   }
+    // });
 
   }
   

@@ -6,6 +6,8 @@ fastify.register(require('./plugins/db'));
 
 // Rotte
 fastify.register(require('./routes/books'), { prefix: '/books' });
+fastify.register(require('./routes/authors'), { prefix: '/authors' });
+fastify.register(require('./routes/genres'),{ prefix: '/genres' });
 
 // Avvio server
 const start = async () => {
