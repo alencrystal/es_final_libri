@@ -1,9 +1,33 @@
 async function routes(fastify, options) {
     // GET /books 
-  fastify.get('/', async (request, reply) => {
+  // fastify.get('/', async (request, reply) => {
+  //     try {
+  //       const [rows] = await fastify.mysql.query(`
+  //         SELECT 
+  //           books.id,
+  //           books.titolo,
+  //           books.anno,
+  //           authors.nome AS autore,
+  //           genres.nome AS genere
+  //         FROM books
+  //         JOIN authors ON books.autore_id = authors.id
+  //         JOIN genres ON books.genere_id = genres.id
+  //       `);
+
+  //       return rows;
+  //     } catch (err) {
+  //       fastify.log.error(err);
+  //       return reply.code(500).send({ error: 'Errore durante il recupero dei libri' });
+  //     }
+  //   });
+
+  
+    // GET /books/:id
+    fastify.get('/:id', async (request, reply) => {
+      const { id } = request.params;
+  
       try {
-        const [rows] = await fastify.mysql.query(`
-          SELECT 
+        const [rows] = await fastify.mysql.query(`SELECT 
             books.id,
             books.titolo,
             books.anno,
@@ -11,42 +35,18 @@ async function routes(fastify, options) {
             genres.nome AS genere
           FROM books
           JOIN authors ON books.autore_id = authors.id
-          JOIN genres ON books.genere_id = genres.id
-        `);
-
-        return rows;
+          JOIN genres ON books.genere_id = genres.id WHERE books.id = ?`, [id]);
+  
+        if (rows.length === 0) {
+          return reply.code(404).send({ error: 'Libro non trovato' });
+        }
+  
+        return rows[0];
       } catch (err) {
         fastify.log.error(err);
-        return reply.code(500).send({ error: 'Errore durante il recupero dei libri' });
+        return reply.code(500).send({ error: 'Errore durante la ricerca del libro' });
       }
     });
-
-  
-    // GET /books/:id
-    // fastify.get('/:id', async (request, reply) => {
-    //   const { id } = request.params;
-  
-    //   try {
-    //     const [rows] = await fastify.mysql.query(`SELECT 
-    //         books.id,
-    //         books.titolo,
-    //         books.anno,
-    //         authors.nome AS autore,
-    //         genres.nome AS genere
-    //       FROM books
-    //       JOIN authors ON books.autore_id = authors.id
-    //       JOIN genres ON books.genere_id = genres.id WHERE id = ?`, [id]);
-  
-    //     if (rows.length === 0) {
-    //       return reply.code(404).send({ error: 'Libro non trovato' });
-    //     }
-  
-    //     return rows[0];
-    //   } catch (err) {
-    //     fastify.log.error(err);
-    //     return reply.code(500).send({ error: 'Errore durante la ricerca del libro' });
-    //   }
-    // });
   
     // POST /books
     fastify.post('/', async (request, reply) => {
@@ -127,10 +127,11 @@ async function routes(fastify, options) {
 //
 
 
-// GET /books/:query --search tramite ID o parola contenuta nel libro
-fastify.get('/:query', async (request, reply) => {
-  const { query } = request.params;
-  const isNumeric = /^\d+$/.test(query); // Verifica se è un intero con un controllo regex (.test restituisce un bool)
+// GET /books/:query --search fatto bene con params in modo da filtrare decentemente
+
+//esempio http://localhost:3000/books?idaut=2&title=come
+fastify.get('/', async (request, reply) => {
+  const { id, title, idgen, idaut, year } = request.query;
 
   try {
     let sql = `
@@ -143,14 +144,36 @@ fastify.get('/:query', async (request, reply) => {
       FROM books
       JOIN authors ON books.autore_id = authors.id
       JOIN genres ON books.genere_id = genres.id
-      WHERE books.titolo LIKE ?
+      WHERE 1 = 1
     `;
 
-    const values = [`%${query}%`];
+    //1 = 1 serve in caso non si mettano filtri restituisce tutti i libri
 
-    if (isNumeric) {
-      sql += ` OR books.id = ?`;
-      values.push(parseInt(query));
+    const values = [];
+
+    if (id) {
+      sql += ` AND books.id = ?`;
+      values.push(parseInt(id));
+    }
+
+    if (title) {
+      sql += ` AND books.titolo LIKE ?`;
+      values.push(`%${title}%`);
+    }
+
+    if (idgen) {
+      sql += ` AND books.genere_id = ?`;
+      values.push(parseInt(idgen));
+    }
+
+    if (idaut) {
+      sql += ` AND books.autore_id = ?`;
+      values.push(parseInt(idaut));
+    }
+
+    if (year) {
+      sql += ` AND books.anno = ?`;
+      values.push(parseInt(year));
     }
 
     const [rows] = await fastify.mysql.query(sql, values);
@@ -158,9 +181,10 @@ fastify.get('/:query', async (request, reply) => {
 
   } catch (err) {
     fastify.log.error(err);
-    reply.status(500).send({ error: 'Errore durante la ricerca' });
+    reply.status(500).send({ error: 'Errore durante la ricerca dei libri' });
   }
 });
+
 
 
 }
